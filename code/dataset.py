@@ -1,4 +1,48 @@
 from code.lib import *
+from code.config import config
+
+
+def get_train_transforms():
+    return A.Compose(
+        [
+            A.RandomSizedCrop(min_max_height=(800, 800), height=1024, width=1024, p=0.5),
+            A.OneOf([
+                A.HueSaturationValue(hue_shift_limit=0.2, sat_shift_limit= 0.2, 
+                                     val_shift_limit=0.2, p=0.9),
+                A.RandomBrightnessContrast(brightness_limit=0.2, 
+                                           contrast_limit=0.2, p=0.9),
+            ],p=0.9),
+            A.ToGray(p=0.01),
+            A.HorizontalFlip(p=0.5),
+            A.VerticalFlip(p=0.5),
+            A.Resize(height=512, width=512, p=1),
+            A.Cutout(num_holes=8, max_h_size=64, max_w_size=64, fill_value=0, p=0.5),
+            ToTensorV2(p=1.0),
+        ], 
+        p=1.0, 
+        bbox_params=A.BboxParams(
+            format='pascal_voc',
+            min_area=0, 
+            min_visibility=0,
+            label_fields=['labels']
+        )
+    )
+
+
+def get_valid_transforms():
+    return A.Compose(
+        [
+            A.Resize(height=512, width=512, p=1.0),
+            ToTensorV2(p=1.0),
+        ], 
+        p=1.0, 
+        bbox_params=A.BboxParams(
+            format='pascal_voc',
+            min_area=0, 
+            min_visibility=0,
+            label_fields=['labels']
+        )
+    )
 
 
 # use cutmix method
@@ -27,18 +71,18 @@ class WheatDataset(Dataset):
         target['label'] = labels
         target['image_id'] = torch.tensor([idx])
         
-#         if self.transforms:
-#             for i in range(10):
-#                 sample = self.transforms(**{
-#                     'image': image,
-#                     'bboxes': target['boxes']
-#                     'labels': labels
-#                 })
-#                 if len(sample['bboxes']) > 0:
-#                     image = sample['image']
-#                     target['boxes'] = torch.stack(tuple(map(torch.tensor, zip(*sample['bboxes'])))).permute(1, 0)
-#                     target['boxes'][:,[0,1,2,3]] = target['boxes'][:,[1,0,3,2]]  #yxyx: be warning
-#                     break
+        if self.transforms:
+            for i in range(10):
+                sample = self.transforms(**{
+                    'image': image,
+                    'bboxes': target['boxes'],
+                    'labels': labels
+                })
+                if len(sample['bboxes']) > 0:
+                    image = sample['image']
+                    target['boxes'] = torch.stack(tuple(map(torch.tensor, zip(*sample['bboxes'])))).permute(1, 0)
+                    target['boxes'][:,[0,1,2,3]] = target['boxes'][:,[1,0,3,2]]  #yxyx: be warning
+                    break
         
         return image, target, image_id
         
@@ -47,24 +91,23 @@ class WheatDataset(Dataset):
         return self.image_ids.shape[0]
     
     
-    def load_image_boxes(self, idx):
+    def load_image_and_boxes(self, idx):
         image_id = self.image_ids[idx]
-        img_path = os.path.join(TRAIN_ROOT_PATH, image_id+'.jpg')
+        img_path = os.path.join(config.train_imgs, image_id+'.jpg')
         
         image = cv2.imread(img_path, cv2.IMREAD_ANYCOLOR)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).astype(np.float32)
         # normalization
-        img /= 255.0
+        image /= 255.0
         
         # get x, y, w, h information
         boxes = self.data_frame[self.data_frame['image_id'] == image_id][['x', 'y', 'w', 'h']].values
         boxes[:, 2] = boxes[:, 0] + boxes[:, 2] # convert w -> x
         boxes[:, 3] = boxes[:, 1] + boxes[:, 3] # convert h -> y
-
         return image, boxes
                 
     
-    def load_cutmix_image_boxes(self, idx, imsize=1024):
+    def load_cutmix_image_and_boxes(self, idx, imsize=1024):
         w, h = imsize, imsize
         s = imsize // 2
         
