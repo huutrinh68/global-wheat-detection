@@ -7,7 +7,8 @@ class Config():
     device = 'cuda:0'
     seed = 42
     lr = 0.001
-    epoch = 20
+    epochs = 20
+    step_scheduler = False
     SchedulerClass = torch.optim.lr_scheduler.ReduceLROnPlateau
     scheduler_params = dict(
         mode='min',
