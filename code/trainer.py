@@ -41,8 +41,6 @@ class Trainner:
             self.epoch += 1
 
 
-
-
     def train_epoch(self, train_loader):
         self.model.train()
         summary_loss = AverageMeter()
