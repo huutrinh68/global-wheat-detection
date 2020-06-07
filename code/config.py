@@ -4,11 +4,13 @@ from code.lib import *
 class Config():
     train_csv = './input/global-wheat-detection/train.csv'
     train_imgs = './input/global-wheat-detection/train'
+    checkpoint = './checkpoint'
     device = 'cuda:0'
     seed = 42
     lr = 0.001
-    epochs = 20
+    n_epochs = 20
     step_scheduler = False
+    validation_scheduler = True
     SchedulerClass = torch.optim.lr_scheduler.ReduceLROnPlateau
     scheduler_params = dict(
         mode='min',
