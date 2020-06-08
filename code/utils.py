@@ -1,6 +1,6 @@
-from code.lib import *
-from code.config import config
-from code.logger import log
+from lib import *
+from config import config
+from logger import log
 
 
 def seed_everything(seed):

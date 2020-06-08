@@ -1,16 +1,17 @@
 # add common library
-from code.logger import logger, log
+from logger import logger, log
 logger.setup('./logs', name='efficientDet')
 
-from code.lib import *
-from code.config import config
-from code.dataset import WheatDataset, get_train_transforms, get_valid_transforms
-from code.utils import seed_everything, read_csv, kfold
-from code.trainer import Trainner
+from lib import *
+from config import config
+from dataset import WheatDataset, get_train_transforms, get_valid_transforms
+from utils import seed_everything, read_csv, kfold
+from trainer import Trainner, collate_fn
 
 
-if __name__ == '__main__':
+def run_training():
     seed_everything(config.seed)
+    device = torch.device(config.device)
 
     # read csv
     data_frame = read_csv(config.train_csv)
@@ -34,15 +35,33 @@ if __name__ == '__main__':
         test=True,
     )
 
-    image, target, image_id = train_dataset[1]
-    boxes = target['boxes'].cpu().numpy().astype(np.int32)
-    numpy_image = image.permute(1,2,0).cpu().numpy()
+    train_loader = torch.utils.data.DataLoader(
+        train_dataset,
+        batch_size=config.batch_size,
+        sampler=RandomSampler(train_dataset),
+        pin_memory=False,
+        drop_last=True,
+        num_workers=config.num_workers,
+        collate_fn=collate_fn,
+    )
+    val_loader = torch.utils.data.DataLoader(
+        validation_dataset, 
+        batch_size=config.batch_size,
+        num_workers=config.num_workers,
+        shuffle=False,
+        sampler=SequentialSampler(validation_dataset),
+        pin_memory=False,
+        collate_fn=collate_fn,
+    )
 
-    for box in boxes:
-        cv2.rectangle(numpy_image, (box[1], box[0]), (box[3],  box[2]), (0, 1, 0), 2)
-    cv2.imshow('img', numpy_image)
-    cv2.waitKey(0)
+    # # model
+    # model.to(device)
 
-    # test with dummy model
-    import torchvision.models as models
-    trainner = Trainner(models.resnet18(), config)
+    # # training
+    # trainer = Trainner(model=model, config=config)
+    # trainer.train(train_loader, val_loader)
+
+
+if __name__ == '__main__':
+    run_training()
+

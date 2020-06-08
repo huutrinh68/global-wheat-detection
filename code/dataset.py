@@ -1,5 +1,5 @@
-from code.lib import *
-from code.config import config
+from lib import *
+from config import config
 
 
 def get_train_transforms():
@@ -68,9 +68,9 @@ class WheatDataset(Dataset):
         
         target = {}
         target['boxes'] = boxes
-        target['label'] = labels
+        target['labels'] = labels
         target['image_id'] = torch.tensor([idx])
-        
+
         if self.transforms:
             for i in range(10):
                 sample = self.transforms(**{
@@ -78,12 +78,16 @@ class WheatDataset(Dataset):
                     'bboxes': target['boxes'],
                     'labels': labels
                 })
+                assert len(sample['bboxes']) == labels.shape[0], 'not equal!'
+
                 if len(sample['bboxes']) > 0:
                     image = sample['image']
                     target['boxes'] = torch.stack(tuple(map(torch.tensor, zip(*sample['bboxes'])))).permute(1, 0)
-                    target['boxes'][:,[0,1,2,3]] = target['boxes'][:,[1,0,3,2]]  #yxyx: be warning
+                    #yxyx: be warning
+                    target['boxes'][:,[0,1,2,3]] = target['boxes'][:,[1,0,3,2]]  
+                    target['labels'] = torch.stack(sample['labels']) # <--- add this!
                     break
-        
+
         return image, target, image_id
         
     
@@ -118,7 +122,7 @@ class WheatDataset(Dataset):
         result_boxes = []
         
         for i, idx in enumerate(idxs):
-            image, boxes = self.load_image_boxes(idx)
+            image, boxes = self.load_image_and_boxes(idx)
             if i == 0:
                 x1a, y1a, x2a, y2a = max(xc - w, 0), max(yc - h, 0), xc, yc  # xmin, ymin, xmax, ymax (large image)
                 x1b, y1b, x2b, y2b = w - (x2a - x1a), h - (y2a - y1a), w, h  # xmin, ymin, xmax, ymax (small image)

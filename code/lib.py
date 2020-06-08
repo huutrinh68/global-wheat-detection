@@ -11,6 +11,7 @@ import albumentations as A
 import matplotlib.pyplot as plt
 from albumentations.pytorch.transforms import ToTensorV2
 from sklearn.model_selection import StratifiedKFold
+import torch
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.data.sampler import SequentialSampler, RandomSampler
 from glob import glob

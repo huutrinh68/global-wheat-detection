@@ -1,4 +1,4 @@
-from code.lib import *
+from lib import *
 
 
 class Config():
@@ -7,8 +7,10 @@ class Config():
     checkpoint = './checkpoint'
     device = 'cuda:0'
     seed = 42
-    lr = 0.001
-    n_epochs = 20
+    lr = 0.0002
+    n_epochs = 50
+    batch_size = 2
+    num_workers = 4
     step_scheduler = False
     validation_scheduler = True
     SchedulerClass = torch.optim.lr_scheduler.ReduceLROnPlateau

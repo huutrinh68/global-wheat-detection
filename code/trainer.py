@@ -1,6 +1,7 @@
-from code.lib import *
-from code.logger import log
+from lib import *
+from logger import log
 from utils import AverageMeter
+from config import config
 
 class Trainner:
     def __init__(self, model, config):
@@ -52,11 +53,17 @@ class Trainner:
             boxes = [target['boxes'].to(self.device).float() for target in targets]
             labels = [target['labels'].to(self.device).float() for target in targets]
 
-            self.optimizer.zero_grad()
-            loss, _, _ = self.model(images, boxes, labels)
-            loss.backward()
+            # boxes = [b["bbox"].to(device) for b in targets] 
+            # labels = [l['cls'].to(device) for l in targets] 
+            targets = {} 
+            targets["bbox"] = boxes 
+            targets["cls"] = labels
 
-            summary_loss.update(loss.detach().item(), batch_size)
+            self.optimizer.zero_grad()
+            loss = self.model(images, targets)
+            loss['loss'].backward()
+
+            summary_loss.update(loss['loss'].detach().item(), batch_size)
             self.optimizer.step()
 
             if self.config.step_scheduler:
@@ -103,3 +110,7 @@ class Trainner:
         self.scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
         self.best_summary_loss = checkpoint['best_summary_loss']
         self.epoch = checkpoint['epoch'] + 1
+
+
+def collate_fn(batch):
+    return tuple(zip(*batch))
