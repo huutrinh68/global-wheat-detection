@@ -78,6 +78,7 @@ class WheatDataset(Dataset):
                     'bboxes': target['boxes'],
                     'labels': labels
                 })
+
                 assert len(sample['bboxes']) == labels.shape[0], 'not equal!'
 
                 if len(sample['bboxes']) > 0:

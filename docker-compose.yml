@@ -1,0 +1,11 @@
+version: "3.3"
+services:
+  engine:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - "./project/:/workspace"
+    ports:
+      - "8889:8888"
+    command: tail -f /dev/null

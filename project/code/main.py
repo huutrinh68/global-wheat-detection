@@ -8,6 +8,19 @@ from dataset import WheatDataset, get_train_transforms, get_valid_transforms
 from utils import seed_everything, read_csv, kfold
 from trainer import Trainner, collate_fn
 
+from efficientdet_master.effdet import get_efficientdet_config, EfficientDet, DetBenchTrain
+from efficientdet_master.effdet.efficientdet import HeadNet
+
+
+def get_net():
+    config = get_efficientdet_config('tf_efficientdet_d7')
+    net = EfficientDet(config, pretrained_backbone=False)
+    checkpoint = torch.load('./input/efficientdet/tf_efficientdet_d7-f05bf714.pth')
+    net.load_state_dict(checkpoint)
+    config.num_classes = 1
+    config.image_size = 512
+    net.class_net = HeadNet(config, num_outputs=config.num_classes, norm_kwargs=dict(eps=.001, momentum=.01))
+    return DetBenchTrain(net, config)
 
 def run_training():
     seed_everything(config.seed)
@@ -54,12 +67,17 @@ def run_training():
         collate_fn=collate_fn,
     )
 
-    # # model
-    # model.to(device)
+    # model
+    model  = get_net()
+    model.to(device)
 
-    # # training
-    # trainer = Trainner(model=model, config=config)
-    # trainer.train(train_loader, val_loader)
+    # training
+    trainer = Trainner(model=model, config=config)
+    trainer.train(train_loader, val_loader)
+
+
+
+    
 
 
 if __name__ == '__main__':
