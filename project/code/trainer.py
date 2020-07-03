@@ -53,10 +53,10 @@ class Trainner:
             boxes = [target['boxes'].to(self.device).float() for target in targets]
             labels = [target['labels'].to(self.device).float() for target in targets]
 
-            # boxes = [b["bbox"].to(device) for b in targets] 
-            # labels = [l['cls'].to(device) for l in targets] 
-            targets = {} 
-            targets["bbox"] = boxes 
+            # boxes = [b["bbox"].to(device) for b in targets]
+            # labels = [l['cls'].to(device) for l in targets]
+            targets = {}
+            targets["bbox"] = boxes
             targets["cls"] = labels
 
             self.optimizer.zero_grad()
@@ -68,12 +68,13 @@ class Trainner:
 
             if self.config.step_scheduler:
                 self.scheduler.step()
-            
+
         return summary_loss
 
 
     def val_epoch(self, val_loader):
-        self.model.eval()
+        #self.model.eval()
+        self.model.train()
         summary_loss = AverageMeter()
         t = time.time()
         for step, (images, targets, image_ids) in enumerate(val_loader):
@@ -81,14 +82,23 @@ class Trainner:
                 images = torch.stack(images)
                 batch_size = images.shape[0]
                 images = images.to(self.device).float()
+                #
+                target_res = {}
+
                 boxes = [target['boxes'].to(self.device).float() for target in targets]
                 labels = [target['labels'].to(self.device).float() for target in targets]
 
-                loss, _, _ = self.model(images, boxes, labels)
-                summary_loss.update(loss.detach().item(), batch_size)
+                #
+                target_res["bbox"] = boxes
+                target_res["cls"] = labels
+
+
+                #loss, _, _ = self.model(images, boxes, labels)
+                loss = self.model(images, target_res)
+                summary_loss.update(loss['loss'].detach().item(), batch_size)
 
         return summary_loss
-    
+
 
     def save_checkpoint(self, path):
         if not os.path.exists(self.checkpoint):
@@ -102,7 +112,7 @@ class Trainner:
             'epoch': self.epoch,
         }, path)
 
-        
+
     def load_checkpoint(self, path):
         checkpoint = torch.load(path)
         self.model.model.load_state_dict(checkpoint['model_state_dict'])
