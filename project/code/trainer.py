@@ -33,7 +33,7 @@ class Trainner:
                 self.best_summary_loss = summary_loss.avg
                 self.model.eval()
                 self.save_checkpoint(f'{self.checkpoint}/best-checkpoint-{str(self.epoch).zfill(3)}epoch.pth')
-                for path in sorted(glob(f'{self.base_dir}/best-checkpoint-*epoch.pth'))[:-3]:
+                for path in sorted(glob(f'{self.checkpoint}/best-checkpoint-*epoch.pth'))[:-3]:
                     os.remove(path)
 
             if self.config.validation_scheduler:
