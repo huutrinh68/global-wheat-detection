@@ -2,7 +2,7 @@ from lib import *
 from logger import log
 from utils import AverageMeter
 from config import config
-
+from tqdm import tqdm
 class Trainner:
     def __init__(self, model, config):
         self.config = config
@@ -46,7 +46,7 @@ class Trainner:
         self.model.train()
         summary_loss = AverageMeter()
         t = time.time()
-        for step, (images, targets, image_ids) in enumerate(train_loader):
+        for images, targets, image_ids in tqdm(train_loader):
             images = torch.stack(images)
             images = images.to(self.device).float()
             batch_size = images.shape[0]
@@ -77,7 +77,7 @@ class Trainner:
         self.model.train()
         summary_loss = AverageMeter()
         t = time.time()
-        for step, (images, targets, image_ids) in enumerate(val_loader):
+        for images, targets, image_ids in tqdm(val_loader):
             with torch.no_grad():
                 images = torch.stack(images)
                 batch_size = images.shape[0]
