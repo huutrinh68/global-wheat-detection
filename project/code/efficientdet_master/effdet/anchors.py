@@ -30,7 +30,7 @@ import torch
 import torch.nn as nn
 from torchvision.ops.boxes import batched_nms, remove_small_boxes
 
-from effdet.object_detection import ArgMaxMatcher, FasterRcnnBoxCoder, BoxList, IouSimilarity, TargetAssigner
+from efficientdet_master.effdet.object_detection import ArgMaxMatcher, FasterRcnnBoxCoder, BoxList, IouSimilarity, TargetAssigner
 
 # The minimum score to consider a logit for identifying detections.
 MIN_CLASS_SCORE = -5.0
