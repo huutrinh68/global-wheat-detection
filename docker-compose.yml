@@ -7,5 +7,6 @@ services:
     volumes:
       - "./project/:/workspace"
     ports:
-      - "8889:8888"
+      - "8888:8888"
+    shm_size: '16gb'
     command: tail -f /dev/null
