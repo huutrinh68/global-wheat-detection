@@ -18,7 +18,7 @@ def get_net():
     checkpoint = torch.load('./input/efficientdet/tf_efficientdet_d7-f05bf714.pth')
     net.load_state_dict(checkpoint)
     config.num_classes = 1
-    config.image_size = 512
+    config.image_size = 1024
     net.class_net = HeadNet(config, num_outputs=config.num_classes, norm_kwargs=dict(eps=.001, momentum=.01))
     return DetBenchTrain(net, config)
 
