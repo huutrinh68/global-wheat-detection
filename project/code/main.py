@@ -1,6 +1,6 @@
 # add common library
 from logger import logger, log
-logger.setup('./logs', name='efficientDet')
+logger.setup('./logs', name='efficientDet-d5-use-pretrained')
 
 from lib import *
 from config import config
@@ -13,14 +13,19 @@ from efficientdet_master.effdet.efficientdet import HeadNet
 
 
 def get_net():
-    config = get_efficientdet_config('tf_efficientdet_d7')
-    net = EfficientDet(config, pretrained_backbone=False)
-    checkpoint = torch.load('./input/efficientdet/tf_efficientdet_d7-f05bf714.pth')
+    # config = get_efficientdet_config('tf_efficientdet_d7')
+    # net = EfficientDet(config, pretrained_backbone=False)
+    # checkpoint = torch.load('./input/efficientdet/tf_efficientdet_d7-f05bf714.pth') #D7
+
+    net_config = get_efficientdet_config('tf_efficientdet_d5')
+    net = EfficientDet(net_config, pretrained_backbone=config.use_pretrained)
+    checkpoint = torch.load('./input/efficientdet/tf_efficientdet_d5-ef44aea8.pth') #D5
+    
     net.load_state_dict(checkpoint)
-    config.num_classes = 1
-    config.image_size = 1024
-    net.class_net = HeadNet(config, num_outputs=config.num_classes, norm_kwargs=dict(eps=.001, momentum=.01))
-    return DetBenchTrain(net, config)
+    net_config.num_classes = 1
+    net_config.image_size = 1024
+    net.class_net = HeadNet(net_config, num_outputs=net_config.num_classes, norm_kwargs=dict(eps=.001, momentum=.01))
+    return DetBenchTrain(net, net_config)
 
 def run_training():
     seed_everything(config.seed)
@@ -69,6 +74,8 @@ def run_training():
 
     # model
     model  = get_net()
+    if len(config.gpu_ids) > 1:
+        model = nn.DataParallel(model)
     model.to(device)
 
     # training

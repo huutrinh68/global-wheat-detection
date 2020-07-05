@@ -133,4 +133,4 @@ dmypy.json
 *.txt 
 
 # checkpoint
-project/checkpoint/*.pth
+project/checkpoint*
