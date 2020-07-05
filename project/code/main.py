@@ -20,14 +20,14 @@ def get_net():
     net_config = get_efficientdet_config('tf_efficientdet_d5')
     net = EfficientDet(net_config, pretrained_backbone=config.use_pretrained)
     checkpoint = torch.load('./input/efficientdet/tf_efficientdet_d5-ef44aea8.pth') #D5
-    
+
     net.load_state_dict(checkpoint)
     net_config.num_classes = 1
     net_config.image_size = 1024
     net.class_net = HeadNet(net_config, num_outputs=net_config.num_classes, norm_kwargs=dict(eps=.001, momentum=.01))
     return DetBenchTrain(net, net_config)
 
-def run_training():
+def run_training(fold_number):
     seed_everything(config.seed)
     device = torch.device(config.device)
 
@@ -38,7 +38,6 @@ def run_training():
     df_folds = kfold(data_frame)
 
     # create dataset
-    fold_number = 0
     train_dataset = WheatDataset(
         image_ids=df_folds[df_folds['fold'] != fold_number].index.values,
         data_frame=data_frame,
@@ -63,7 +62,7 @@ def run_training():
         collate_fn=collate_fn,
     )
     val_loader = torch.utils.data.DataLoader(
-        validation_dataset, 
+        validation_dataset,
         batch_size=config.batch_size,
         num_workers=config.num_workers,
         shuffle=False,
@@ -79,11 +78,13 @@ def run_training():
     model.to(device)
 
     # training
-    trainer = Trainner(model=model, config=config)
+    trainer = Trainner(model=model, config=config, fold_number=fold_number)
     trainer.train(train_loader, val_loader)
 
 
 
 if __name__ == '__main__':
-    run_training()
-
+    #train 5 folds
+    for i in range(5):
+        log.info(f'Fold {i}')
+        run_training(fold_number = i)

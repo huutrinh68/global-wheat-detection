@@ -4,8 +4,9 @@ from utils import AverageMeter
 from config import config
 from tqdm import tqdm
 class Trainner:
-    def __init__(self, model, config):
+    def __init__(self, model, config, fold_number):
         self.config = config
+        self.fold_number = fold_number
         self.epoch = 0
 
         self.best_summary_loss = 10**5
@@ -22,18 +23,18 @@ class Trainner:
         for epoch in range(self.config.n_epochs):
             t =time.time()
             summary_loss = self.train_epoch(train_loader)
-            log.info(f'[RESULT]: Train. Epoch: {self.epoch}, summary_loss: {summary_loss.avg:.5f}, time: {(time.time() - t):.5f}')
-            self.save_checkpoint(f'{self.checkpoint}/last-checkpoint.pth')
+            log.info(f'[RESULT]: Train. fold: {self.fold_number}, Epoch: {self.epoch}, summary_loss: {summary_loss.avg:.5f}, time: {(time.time() - t):.5f}')
+            self.save_checkpoint(f'{self.checkpoint}/fold{self.fold_number}-last-checkpoint.pth')
 
             t = time.time()
             summary_loss = self.val_epoch(validation_loader)
-            log.info(f'[RESULT]: Val. Epoch: {self.epoch}, summary_loss: {summary_loss.avg:.5f}, time: {(time.time() - t):.5f}')
+            log.info(f'[RESULT]: Val. fold: {self.fold_number}, Epoch: {self.epoch}, summary_loss: {summary_loss.avg:.5f}, time: {(time.time() - t):.5f}')
 
             if summary_loss.avg < self.best_summary_loss:
                 self.best_summary_loss = summary_loss.avg
                 self.model.eval()
-                self.save_checkpoint(f'{self.checkpoint}/best-checkpoint-{str(self.epoch).zfill(3)}epoch.pth')
-                for path in sorted(glob(f'{self.checkpoint}/best-checkpoint-*epoch.pth'))[:-3]:
+                self.save_checkpoint(f'{self.checkpoint}/fold{self.fold_number}-best-checkpoint-{str(self.epoch).zfill(3)}epoch.pth')
+                for path in sorted(glob(f'{self.checkpoint}/fold{self.fold_number}-best-checkpoint-*epoch.pth'))[:-3]:
                     os.remove(path)
 
             if self.config.validation_scheduler:
