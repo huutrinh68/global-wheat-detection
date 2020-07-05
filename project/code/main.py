@@ -87,4 +87,4 @@ if __name__ == '__main__':
     #train 5 folds
     for i in range(5):
         log.info(f'Fold {i}')
-        run_training(fold_number = i)
+        run_training(fold_number=i)

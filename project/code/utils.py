@@ -24,7 +24,7 @@ def read_csv(file_path):
 
 
 def kfold(data):
-    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=config.seed)
 
     df_folds = data[['image_id']].copy()
     df_folds.loc[:, 'bbox_count'] = 1
