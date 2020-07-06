@@ -58,12 +58,10 @@ class WheatDataset(Dataset):
     def __getitem__(self, idx):
         image_id = self.image_ids[idx]
 
-        if self.test or random.random() > 0.6:
+        if self.test or random.random() > 0.5:
             image, boxes = self.load_image_and_boxes(idx)
-        elif random.random() > 0.3:
-            image, boxes = self.load_cutmix_image_and_boxes(idx)
         else:
-            image, boxes = self.load_mixup_image_and_boxes(idx)
+            image, boxes = self.load_cutmix_image_and_boxes(idx)
 
         # there is only one class
         labels = torch.ones((boxes.shape[0],), dtype=torch.int64)
@@ -162,8 +160,3 @@ class WheatDataset(Dataset):
         result_boxes = result_boxes[np.where((result_boxes[:,2]-result_boxes[:,0])*(result_boxes[:,3]-result_boxes[:,1]) > 0)]
 
         return result_image, result_boxes
-
-    def load_mixup_image_and_boxes(self, idx):
-      image, boxes = self.load_image_and_boxes(idx)
-      r_image, r_boxes = self.load_image_and_boxes(random.randint(0, self.image_ids.shape[0] - 1))
-      return (image+r_image)/2, np.vstack((boxes, r_boxes)).astype(np.int32)
