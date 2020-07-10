@@ -17,8 +17,8 @@ def get_train_transforms():
             #A.VerticalFlip(p=0.5),
             #A.Resize(height=1024, width=1024, p=1),
             #A.Cutout(num_holes=8, max_h_size=64, max_w_size=64, fill_value=0, p=0.5),
-            A.Flip(p=0.6),
-            A.Rotate(limit=45, p=0.6),
+            A.Flip(p=0.5),
+            A.Rotate(limit=45, p=0.5),
             ToTensorV2(p=1.0),
         ],
         p=1.0,
@@ -60,9 +60,9 @@ class WheatDataset(Dataset):
     def __getitem__(self, idx):
         image_id = self.image_ids[idx]
 
-        if self.test or random.random() > 0.6:
+        if self.test or random.random() > 0.5:
             image, boxes = self.load_image_and_boxes(idx)
-        elif random.random() > 0.3:
+        elif random.random() > 0.25:
             image, boxes = self.load_cutmix_image_and_boxes(idx)
         else:
             image, boxes = self.load_mixup_image_and_boxes(idx)

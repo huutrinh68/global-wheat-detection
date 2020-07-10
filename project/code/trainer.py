@@ -15,6 +15,7 @@ class Trainner:
         self.checkpoint = config.checkpoint
 
         self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=config.lr)
+        #self.optimizer = torch.optim.SGD(self.model.parameters(), lr=config.lr, momentum=0.9, weight_decay=4e-5)
         self.scheduler = config.SchedulerClass(self.optimizer, **config.scheduler_params)
         log.info(f'Trainer prepared. Device is {self.device}')
 

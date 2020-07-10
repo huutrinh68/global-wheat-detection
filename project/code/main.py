@@ -1,6 +1,6 @@
 # add common library
 from logger import logger, log
-logger.setup('./logs', name='efficientDet-d5-use-pretrained')
+logger.setup('./logs', name='efficientDet-d5-cutmix-sgd')
 
 from lib import *
 from config import config
@@ -85,6 +85,6 @@ def run_training(fold_number):
 
 if __name__ == '__main__':
     #train 5 folds
-    for i in range(5):
+    for i in range(1):
         log.info(f'Fold {i}')
         run_training(fold_number=i)
