@@ -12,7 +12,8 @@ class Config():
         device = torch.device('cuda:3')
     use_pretrained = False
     seed = 42
-    lr = 0.0002
+    #lr = 0.0002
+    lr = 0.005
     n_epochs = 200
     batch_size = 2
     num_workers = 6
@@ -23,10 +24,10 @@ class Config():
         mode='min',
         factor=0.5,
         patience=2,
-        verbose=False, 
+        verbose=False,
         threshold=0.0001,
         threshold_mode='abs',
-        cooldown=0, 
+        cooldown=0,
         min_lr=1e-8,
         eps=1e-08
     )
