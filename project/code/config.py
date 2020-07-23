@@ -12,8 +12,8 @@ class Config():
         device = torch.device('cuda:3')
     use_pretrained = False
     seed = 42
-    #lr = 0.0002
-    lr = 0.005
+    lr = 0.0004
+    #lr = 0.005
     n_epochs = 200
     batch_size = 2
     num_workers = 6
