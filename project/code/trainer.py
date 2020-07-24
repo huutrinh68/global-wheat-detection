@@ -14,9 +14,11 @@ class Trainner:
         self.device = config.device
         self.checkpoint = config.checkpoint
 
-        self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=config.lr)
+        #self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=config.lr)
         #self.optimizer = torch.optim.SGD(self.model.parameters(), lr=config.lr, momentum=0.9, weight_decay=4e-5)
-        self.scheduler = config.SchedulerClass(self.optimizer, **config.scheduler_params)
+        #self.scheduler = config.SchedulerClass(self.optimizer, **config.scheduler_params)
+        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=config.lr, momentum=0.9, weight_decay=4e-5)
+        self.scheduler = config.SchedulerClass(self.optimizer, T_max=50, eta_min=5e-6)
         log.info(f'Trainer prepared. Device is {self.device}')
 
 
@@ -38,8 +40,8 @@ class Trainner:
                 for path in sorted(glob(f'{self.checkpoint}/fold{self.fold_number}-best-checkpoint-*epoch.pth'))[:-3]:
                     os.remove(path)
 
-            if self.config.validation_scheduler:
-                self.scheduler.step(metrics=summary_loss.avg)
+            #if self.config.validation_scheduler:
+            #    self.scheduler.step(metrics=summary_loss.avg)
 
             self.epoch += 1
 
