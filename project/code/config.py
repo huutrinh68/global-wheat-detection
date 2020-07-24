@@ -23,7 +23,7 @@ class Config():
     scheduler_params = dict(
         mode='min',
         factor=0.5,
-        patience=2,
+        patience=3,
         verbose=False,
         threshold=0.0001,
         threshold_mode='abs',
