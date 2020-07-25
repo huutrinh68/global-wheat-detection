@@ -13,6 +13,7 @@ class Trainner:
         self.model = model
         self.device = config.device
         self.checkpoint = config.checkpoint
+        self.accumulate = config.accumulate
 
         self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=config.lr)
         #self.optimizer = torch.optim.SGD(self.model.parameters(), lr=config.lr, momentum=0.9, weight_decay=4e-5)
@@ -48,7 +49,7 @@ class Trainner:
         self.model.train()
         summary_loss = AverageMeter()
         t = time.time()
-        for images, targets, image_ids in tqdm(train_loader):
+        for step, (images, targets, image_ids) in enumerate(tqdm(train_loader)):
             images = torch.stack(images)
             images = images.to(self.device).float()
             batch_size = images.shape[0]
@@ -63,13 +64,14 @@ class Trainner:
 
             self.optimizer.zero_grad()
             loss = self.model(images, targets)
+            #normalization loss(averaged)
+            #loss = loss / self.accumulate
             loss['loss'].backward()
-
+            if (step + 1) % self.accumulate == 0:
+                self.optimizer.step()
+                if self.config.step_scheduler:
+                    self.scheduler.step()
             summary_loss.update(loss['loss'].detach().item(), batch_size)
-            self.optimizer.step()
-
-            if self.config.step_scheduler:
-                self.scheduler.step()
 
         return summary_loss
 

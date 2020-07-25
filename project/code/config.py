@@ -14,7 +14,8 @@ class Config():
     seed = 42
     lr = 0.0004
     #lr = 0.005
-    n_epochs = 200
+    accumulate = 8
+    n_epochs = 150
     batch_size = 2
     num_workers = 6
     step_scheduler = False
