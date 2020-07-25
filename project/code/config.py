@@ -3,13 +3,13 @@ from lib import *
 class Config():
     train_csv = './input/global-wheat-detection/train.csv'
     train_imgs = './input/global-wheat-detection/train'
-    checkpoint = './checkpoint-d5-mixup-adam-tune-augs'
+    checkpoint = './checkpoint-d5-namdt-sgd1'
     # gpu_ids = [0, 1, 2, 3] # change to gpus you want to use
-    gpu_ids = [3]
+    gpu_ids = [0]
     if len(gpu_ids) > 1:
         device = torch.device(f'cuda:{gpu_ids}')
     else:
-        device = torch.device('cuda:3')
+        device = torch.device('cuda:0')
     use_pretrained = False
     seed = 42
     #lr = 0.0004
