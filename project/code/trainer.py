@@ -19,7 +19,7 @@ class Trainner:
         #self.optimizer = torch.optim.SGD(self.model.parameters(), lr=config.lr, momentum=0.9, weight_decay=4e-5)
         #self.scheduler = config.SchedulerClass(self.optimizer, **config.scheduler_params)
         self.optimizer = torch.optim.SGD(self.model.parameters(), lr=config.lr, momentum=0.9, weight_decay=4e-5)
-        self.scheduler = config.SchedulerClass(self.optimizer, T_max=50, eta_min=5e-6)
+        self.scheduler = config.SchedulerClass(self.optimizer, T_max=20, eta_min=5e-6)
         log.info(f'Trainer prepared. Device is {self.device}')
 
 

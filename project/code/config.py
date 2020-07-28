@@ -3,11 +3,8 @@ from lib import *
 class Config():
     train_csv = './input/global-wheat-detection/train.csv'
     train_imgs = './input/global-wheat-detection/train'
-<<<<<<< HEAD
-    checkpoint = './checkpoint-d5-master'
-=======
+    #checkpoint = './checkpoint-d5-master'
     checkpoint = './checkpoint-d5-namdt-sgd1'
->>>>>>> 8a0c39332080de624026dcdc3663b9df1d484413
     # gpu_ids = [0, 1, 2, 3] # change to gpus you want to use
     gpu_ids = [0]
     if len(gpu_ids) > 1:
@@ -16,27 +13,15 @@ class Config():
         device = torch.device('cuda:0')
     use_pretrained = False
     seed = 42
-<<<<<<< HEAD
-    lr = 0.0004
-    #lr = 0.005
-    accumulate = 8
-    n_epochs = 150
-    batch_size = 2
-    num_workers = 3
-    step_scheduler = False
-    validation_scheduler = True
-    SchedulerClass = torch.optim.lr_scheduler.ReduceLROnPlateau
-=======
     #lr = 0.0004
     lr = 0.005
     n_epochs = 200
     batch_size = 2
-    num_workers = 6
+    num_workers = 3
     step_scheduler = True
     validation_scheduler = False
     #SchedulerClass = torch.optim.lr_scheduler.ReduceLROnPlateau
     SchedulerClass = torch.optim.lr_scheduler.CosineAnnealingLR
->>>>>>> 8a0c39332080de624026dcdc3663b9df1d484413
     scheduler_params = dict(
         mode='min',
         factor=0.5,
