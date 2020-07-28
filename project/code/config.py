@@ -17,14 +17,14 @@ class Config():
     accumulate = 8
     n_epochs = 150
     batch_size = 2
-    num_workers = 6
+    num_workers = 3
     step_scheduler = False
     validation_scheduler = True
     SchedulerClass = torch.optim.lr_scheduler.ReduceLROnPlateau
     scheduler_params = dict(
         mode='min',
         factor=0.5,
-        patience=3,
+        patience=2,
         verbose=False,
         threshold=0.0001,
         threshold_mode='abs',
