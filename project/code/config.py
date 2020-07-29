@@ -17,6 +17,7 @@ class Config():
     lr = 0.005
     n_epochs = 200
     batch_size = 2
+    accumulate = 8
     num_workers = 3
     step_scheduler = True
     validation_scheduler = False
